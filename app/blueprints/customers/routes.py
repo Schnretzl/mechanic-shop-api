@@ -1,10 +1,36 @@
 from flask import request, jsonify
 from app.blueprints.customers import customers_blueprint
-from app.blueprints.customers.schemas import customer_schema, customers_schema
+from app.blueprints.customers.schemas import CustomerSchema, customer_schema, customers_schema, login_schema
 from app.extensions import limiter, cache
 from marshmallow import ValidationError
 from app.models import Customer, db
-from sqlalchemy import select, delete
+from sqlalchemy import select
+from app.utils.util import encode_token, token_required
+
+@customers_blueprint.route('/login', methods=['POST'])
+def login():
+    try:
+        credentials = login_schema.load(request.json)
+        email = credentials['email']
+        password = credentials['password']
+    except ValidationError as e:
+        return jsonify(e.messages), 400
+    
+    query = select(Customer).where(Customer.email == email)
+    customer = db.session.execute(query).scalars().first()
+    
+    if customer and customer.password == password:
+        token = encode_token(customer.id)
+        
+        response = {
+            'status': 'success',
+            'message': 'Successfully logged in',
+            'token': token
+        }
+        
+        return jsonify(response), 200
+    else:
+        return jsonify({'message': 'Invalid email or password.'}), 401
 
 @customers_blueprint.route('/', methods=['POST'])
 @limiter.limit("3 per hour")
@@ -14,7 +40,7 @@ def create_customer():
     except ValidationError as e:
         return jsonify(e.messages), 400
         
-    new_customer = Customer(name=customer_data['name'], email=customer_data['email'], phone=customer_data['phone'])
+    new_customer = Customer(name=customer_data['name'], email=customer_data['email'], phone=customer_data['phone'], password=customer_data['password'])
     
     db.session.add(new_customer)
     db.session.commit()
@@ -48,11 +74,12 @@ def update_customer(customer_id):
     
     return customer_schema.jsonify(customer), 200
 
-@customers_blueprint.route('/<int:customer_id>', methods=['DELETE'])
+@customers_blueprint.route('/', methods=['DELETE'])
+@token_required
 def delete_customer(customer_id):
     query = select(Customer).where(Customer.id == customer_id)
     customer = db.session.execute(query).scalars().first()
     
     db.session.delete(customer)
     db.session.commit()
-    return jsonify({'message': 'Member deleted'}), 200
+    return jsonify({'message': 'Customer deleted'}), 200

@@ -54,7 +54,8 @@ def get_customers():
     result = db.session.execute(query).scalars().all()
     return customers_schema.jsonify(result), 200
 
-@customers_blueprint.route('/<int:customer_id>', methods=['PUT'])
+@customers_blueprint.route('/', methods=['PUT'])
+@token_required
 def update_customer(customer_id):
     query = select(Customer).where(Customer.id == customer_id)
     customer = db.session.execute(query).scalars().first()

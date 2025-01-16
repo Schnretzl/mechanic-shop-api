@@ -3,8 +3,6 @@ from datetime import datetime, timezone, timedelta
 from functools import wraps
 from flask import request, jsonify
 
-from app.blueprints.customers.schemas import CustomerSchema
-
 
 SECRET_KEY = 'nobody knows this key'
 
@@ -24,6 +22,7 @@ def token_required(f):
         
         if 'Authorization' in request.headers:
             token = request.headers['Authorization'].split()[1]
+            print(f"Token: {token}")
             
             if not token:
                 return jsonify({'message': 'Missing token'}), 401

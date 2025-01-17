@@ -1,6 +1,7 @@
 from flask import request, jsonify
 from app.blueprints.customers import customers_blueprint
-from app.blueprints.customers.schemas import CustomerSchema, customer_schema, customers_schema, login_schema
+from app.blueprints.customers.schemas import customer_schema, customers_schema, login_schema
+from app.blueprints.service_tickets.schemas import customer_service_tickets_schema
 from app.extensions import limiter, cache
 from marshmallow import ValidationError
 from app.models import Customer, db
@@ -53,6 +54,21 @@ def get_customers():
     query = select(Customer)
     result = db.session.execute(query).scalars().all()
     return customers_schema.jsonify(result), 200
+
+@customers_blueprint.route('/service_tickets', methods=['GET'])
+@token_required
+def get_customer_tickets(customer_id):
+    query = select(Customer).where(Customer.id == customer_id)
+    customer = db.session.execute(query).scalars().first()
+    
+    if customer is None:
+        return jsonify({'message': 'Customer not found'}), 404
+    
+    service_tickets = customer.service_tickets
+    print(service_tickets)
+    
+    return customer_service_tickets_schema.jsonify(service_tickets), 200
+    
 
 @customers_blueprint.route('/', methods=['PUT'])
 @token_required

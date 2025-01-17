@@ -3,7 +3,7 @@ from app.blueprints.mechanics import mechanics_blueprint
 from app.blueprints.mechanics.schemas import mechanic_schema, mechanics_schema
 from app.extensions import limiter
 from marshmallow import ValidationError
-from app.models import Mechanic, db
+from app.models import Mechanic, Service_Ticket, db
 from sqlalchemy import select
 
 @mechanics_blueprint.route('/', methods=['POST'])
@@ -55,4 +55,14 @@ def delete_mechanic(mechanic_id):
     
     db.session.delete(mechanic)
     db.session.commit()
+    
     return jsonify({'message': 'Member deleted'}), 200
+
+@mechanics_blueprint.route('/popular', methods=['GET'])
+def popular_mechanics():
+    query = select(Mechanic)
+    mechanics = db.session.execute(query).scalars().all()
+    
+    mechanics.sort(key=lambda mechanic: len(mechanic.service_tickets), reverse=True)
+    
+    return mechanics_schema.jsonify(mechanics), 200

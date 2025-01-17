@@ -66,3 +66,12 @@ def popular_mechanics():
     mechanics.sort(key=lambda mechanic: len(mechanic.service_tickets), reverse=True)
     
     return mechanics_schema.jsonify(mechanics), 200
+
+@mechanics_blueprint.route('/search', methods=['GET'])
+def search_mechanics():
+    name = request.args.get('name')
+    
+    query = select(Mechanic).where(Mechanic.name.like(f'%{name}%'))
+    mechanics = db.session.execute(query).scalars().all()
+    
+    return mechanics_schema.jsonify(mechanics), 200

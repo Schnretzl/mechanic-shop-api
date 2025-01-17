@@ -10,7 +10,7 @@ def encode_token(user_id):
     payload = {
         'exp': datetime.now(timezone.utc) + timedelta(days=0, hours=1),
         'iat': datetime.now(timezone.utc),
-        'sub': user_id
+        'sub': str(user_id)
     }
     
     return jwt.encode(payload, SECRET_KEY, algorithm='HS256')
@@ -22,7 +22,6 @@ def token_required(f):
         
         if 'Authorization' in request.headers:
             token = request.headers['Authorization'].split()[1]
-            print(f"Token: {token}")
             
             if not token:
                 return jsonify({'message': 'Missing token'}), 401

@@ -1,3 +1,4 @@
+from pydoc import pager
 from flask import request, jsonify
 from app.blueprints.customers import customers_blueprint
 from app.blueprints.customers.schemas import customer_schema, customers_schema, login_schema
@@ -49,11 +50,18 @@ def create_customer():
     return customer_schema.jsonify(new_customer), 201
 
 @customers_blueprint.route('/', methods=['GET'])
-@cache.cached(timeout=60)
+# @cache.cached(timeout=60)
 def get_customers():
-    query = select(Customer)
-    result = db.session.execute(query).scalars().all()
-    return customers_schema.jsonify(result), 200
+    try:
+        page = int(request.args.get('page'))
+        per_page = int(request.args.get('per_page'))
+        query = select(Customer)
+        customers = db.paginate(query, page=page, per_page=per_page)
+        return customers_schema.jsonify(customers), 200
+    except:
+        query = select(Customer)
+        result = db.session.execute(query).scalars().all()
+        return customers_schema.jsonify(result), 200
 
 @customers_blueprint.route('/service_tickets', methods=['GET'])
 @token_required

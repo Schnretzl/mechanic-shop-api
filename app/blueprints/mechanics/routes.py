@@ -3,11 +3,11 @@ from app.blueprints.mechanics import mechanics_blueprint
 from app.blueprints.mechanics.schemas import mechanic_schema, mechanics_schema
 from app.extensions import limiter
 from marshmallow import ValidationError
-from app.models import Mechanic, Service_Ticket, db
+from app.models import Mechanic, ServiceTicket, db
 from sqlalchemy import select
 
 @mechanics_blueprint.route('/', methods=['POST'])
-@limiter.limit("3 per hour")
+# @limiter.limit("3 per hour")
 def create_mechanic():
     try:
         mechanic_data = mechanic_schema.load(request.json)

@@ -35,7 +35,7 @@ def login():
         return jsonify({'message': 'Invalid email or password.'}), 401
 
 @customers_blueprint.route('/', methods=['POST'])
-@limiter.limit("3 per hour")
+# @limiter.limit("3 per hour")
 def create_customer():
     try:
         customer_data = customer_schema.load(request.json)

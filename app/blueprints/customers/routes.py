@@ -1,4 +1,3 @@
-from pydoc import pager
 from flask import request, jsonify
 from app.blueprints.customers import customers_blueprint
 from app.blueprints.customers.schemas import customer_schema, customers_schema, login_schema
@@ -35,7 +34,7 @@ def login():
         return jsonify({'message': 'Invalid email or password.'}), 401
 
 @customers_blueprint.route('/', methods=['POST'])
-# @limiter.limit("3 per hour")
+@limiter.limit("3 per hour")
 def create_customer():
     try:
         customer_data = customer_schema.load(request.json)
@@ -50,7 +49,6 @@ def create_customer():
     return customer_schema.jsonify(new_customer), 201
 
 @customers_blueprint.route('/', methods=['GET'])
-# @cache.cached(timeout=60)
 def get_customers():
     try:
         page = int(request.args.get('page'))
@@ -63,7 +61,7 @@ def get_customers():
         result = db.session.execute(query).scalars().all()
         return customers_schema.jsonify(result), 200
 
-@customers_blueprint.route('/service_tickets', methods=['GET'])
+@customers_blueprint.route('/my-tickets', methods=['GET'])
 @token_required
 def get_customer_tickets(customer_id):
     query = select(Customer).where(Customer.id == customer_id)

@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from app.blueprints.customers import customers_blueprint
-from app.blueprints.customers.schemas import customer_schema, customers_schema, login_schema
+from app.blueprints.customers.schemas import customer_schema, customers_schema, customer_login_schema
 from app.blueprints.service_tickets.schemas import customer_service_tickets_schema
 from app.extensions import limiter, cache
 from marshmallow import ValidationError
@@ -11,7 +11,7 @@ from app.utils.util import encode_token, token_required
 @customers_blueprint.route('/login', methods=['POST'])
 def login():
     try:
-        credentials = login_schema.load(request.json)
+        credentials = customer_login_schema.load(request.json)
         email = credentials['email']
         password = credentials['password']
     except ValidationError as e:
@@ -105,4 +105,4 @@ def delete_customer(customer_id):
     
     db.session.delete(customer)
     db.session.commit()
-    return jsonify({'message': 'Customer deleted'}), 200
+    return jsonify({'message': f'Successfully deleted customer {customer_id}'}), 200

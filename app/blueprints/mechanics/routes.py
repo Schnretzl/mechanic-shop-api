@@ -1,10 +1,36 @@
 from flask import request, jsonify
 from app.blueprints.mechanics import mechanics_blueprint
-from app.blueprints.mechanics.schemas import mechanic_schema, mechanics_schema
+from app.blueprints.mechanics.schemas import mechanic_schema, mechanics_schema, mechanic_login_schema
 from app.extensions import limiter, cache
 from marshmallow import ValidationError
 from app.models import Mechanic, ServiceTicket, db
 from sqlalchemy import select
+from app.utils.util import encode_token, token_required
+
+@mechanics_blueprint.route('/login', methods=['POST'])
+def login():
+    try:
+        credentials = mechanic_login_schema.load(request.json)
+        email = credentials['email']
+        password = credentials['password']
+    except ValidationError as e:
+        return jsonify(e.messages), 400
+    
+    query = select(Mechanic).where(Mechanic.email == email)
+    mechanic = db.session.execute(query).scalars().first()
+    
+    if mechanic and mechanic.password == password:
+        token = encode_token(mechanic.id)
+        
+        response = {
+            'status': 'success',
+            'message': 'Successfully logged in',
+            'token': token
+        }
+        
+        return jsonify(response), 200
+    else:
+        return jsonify({'message': 'Invalid email or password.'}), 401
 
 @mechanics_blueprint.route('/', methods=['POST'])
 @limiter.limit("3 per hour")
@@ -15,7 +41,7 @@ def create_mechanic():
     except ValidationError as e:
         return jsonify(e.messages), 400
         
-    new_mechanic = Mechanic(name=mechanic_data['name'], email=mechanic_data['email'], phone=mechanic_data['phone'], salary=mechanic_data['salary'])
+    new_mechanic = Mechanic(name=mechanic_data['name'], email=mechanic_data['email'], phone=mechanic_data['phone'], salary=mechanic_data['salary'], password=mechanic_data['password'])
     
     db.session.add(new_mechanic)
     db.session.commit()
@@ -28,7 +54,8 @@ def get_mechanics():
     result = db.session.execute(query).scalars().all()
     return mechanics_schema.jsonify(result), 200
 
-@mechanics_blueprint.route('/<int:mechanic_id>', methods=['PUT'])
+@mechanics_blueprint.route('/', methods=['PUT'])
+@token_required
 def update_mechanic(mechanic_id):
     query = select(Mechanic).where(Mechanic.id == mechanic_id)
     mechanic = db.session.execute(query).scalars().first()
@@ -48,7 +75,8 @@ def update_mechanic(mechanic_id):
     
     return mechanic_schema.jsonify(mechanic), 200
 
-@mechanics_blueprint.route('/<int:mechanic_id>', methods=['DELETE'])
+@mechanics_blueprint.route('/', methods=['DELETE'])
+@token_required
 def delete_mechanic(mechanic_id):
     query = select(Mechanic).where(Mechanic.id == mechanic_id)
     mechanic = db.session.execute(query).scalars().first()

@@ -1,0 +1,112 @@
+swagger: '2.0'
+info:
+  title: 'Mechanic Shop API'
+  description: 'API for managing a mechanic shop'
+  version: 1.0.0
+host: '127.0.0.1:5000'
+schemes:
+  - 'http'
+consumes:
+  - 'application/json'
+produces:
+  - 'application/json'
+paths:
+  /customers/login:
+    post:
+      tags:
+        - 'customers'
+      summary: 'Login endpoint'
+      description: 'Validates customer login credentials, generates and returns a customer specific token'
+      parameters:
+        - in: 'body'
+          name: 'body'
+          description: 'Customer login credentials'
+          required: true
+          schema:
+            $ref: '#/definitions/CustomerLogin'
+      responses:
+        '200':
+          description: 'Login successful'
+          schema:
+            $ref: '#/definitions/LoginResponse'
+
+  /customers:
+    post:
+      tags:
+        - 'customers'
+      summary: 'Endpoint to create/register a new customer'
+      description: 'Endpoint to create a new customer for our mechanic shop system, email must be unique'
+      parameters:
+        - in: 'body'
+          name: 'body'
+          description: 'Information required to create a new customer'
+          required: true
+          schema:
+            $ref: '#/definitions/CreateCustomerPayload'
+      responses:
+        '201':
+          description: 'Customer created'
+          schema:
+            $ref: '#/definitions/CreateCustomerResponse'
+    examples:
+      application/json:
+        id: 1
+        name: 'John Doe'
+        email: 'johnd@email.com'
+        phone: '1234567890'
+        password: 'password123'
+
+definitions:
+  CustomerLogin:
+    type: 'object'
+    properties:
+      email:
+        type: 'string'
+      password:
+        type: 'string'
+
+    required:
+      - 'email'
+      - 'password'
+
+  LoginResponse:
+    type: 'object'
+    properties:
+      token:
+        type: 'string'
+      message:
+        type: 'string'
+      status:
+        type: 'string'
+
+  CreateCustomerPayload:
+    type: 'object'
+    properties:
+      name:
+        type: 'string'
+      email:
+        type: 'string'
+      phone:
+        type: 'string'
+      password:
+        type: 'string'
+
+    required:
+      - 'name'
+      - 'email'
+      - 'phone'
+      - 'password'
+
+  CreateCustomerResponse:
+    type: 'object'
+    properties:
+      id:
+        type: 'integer'
+      name:
+        type: 'string'
+      email:
+        type: 'string'
+      phone:
+        type: 'string'
+      password:
+        type: 'string'

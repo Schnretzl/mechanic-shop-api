@@ -10,11 +10,18 @@ consumes:
   - 'application/json'
 produces:
   - 'application/json'
+
+securityDefinitions:
+  bearerAuth:
+    type: apiKey
+    name: Authorization
+    in: header
+
 paths:
   /customers/login:
     post:
       tags:
-        - 'customers'
+        - 'Customers'
       summary: 'Login endpoint'
       description: 'Validates customer login credentials, generates and returns a customer specific token'
       parameters:
@@ -33,7 +40,7 @@ paths:
   /customers:
     post:
       tags:
-        - 'customers'
+        - 'Customers'
       summary: 'Endpoint to create/register a new customer'
       description: 'Endpoint to create a new customer for our mechanic shop system, email must be unique'
       parameters:
@@ -48,13 +55,70 @@ paths:
           description: 'Customer created'
           schema:
             $ref: '#/definitions/CreateCustomerResponse'
-    examples:
-      application/json:
-        id: 1
-        name: 'John Doe'
-        email: 'johnd@email.com'
-        phone: '1234567890'
-        password: 'password123'
+          examples:
+            application/json:
+              id: 1
+              name: 'John Doe'
+              email: 'johnd@email.com'
+              phone: '1234567890'
+              password: 'password123'
+
+    get:
+      tags:
+        - 'Customers'
+      summary: 'Returns all customers'
+      description: 'Endpoint to retrieve a list of all customers'
+      responses:
+        '200':
+          description: 'Customers retrieved successfully'
+          schema:
+            $ref: '#/definitions/AllCustomers'
+
+    put:
+      tags:
+        - 'Customers'
+      summary: 'Endpoint to update a customer'
+      description: 'Endpoint to update a customer, this is a token authenticated route, and the user must be logged in to update their information'
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: 'body'
+          name: 'body'
+          description: 'Information required to update a customer'
+          required: true
+          schema:
+            $ref: '#/definitions/UpdateCustomerPayload'
+      responses:
+        '200':
+          description: 'Customer updated'
+          schema:
+            $ref: '#/definitions/UpdateCustomerResponse'
+          examples:
+            application/json:
+              id: 1
+              name: 'Dohn Joe'
+              email: 'dohnj@email.com'
+              phone: '9876543210'
+              password: 'password123'
+
+    delete:
+      tags:
+        - 'Customers'
+      summary: 'Endpoint to delete a customer'
+      description: 'Endpoint to delete a customer.  Requires token authentication, customer must be logged in to delete their account'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 'Successfully deleted customer'
+          schema:
+            $ref: '#/definitions/DeleteCustomerResponse'
+          examples:
+            application/json:
+              message: 'successfully deleted customer <customer_id>'
+
+  
+# =================================================================================================
 
 definitions:
   CustomerLogin:
@@ -98,6 +162,68 @@ definitions:
       - 'password'
 
   CreateCustomerResponse:
+    type: 'object'
+    properties:
+      id:
+        type: 'integer'
+      name:
+        type: 'string'
+      email:
+        type: 'string'
+      phone:
+        type: 'string'
+      password:
+        type: 'string'
+
+  AllCustomers:
+    type: 'array'
+    items:
+      type: 'object'
+      properties:
+        id:
+          type: 'integer'
+        name:
+          type: 'string'
+        email:
+          type: 'string'
+        phone:
+          type: 'string'
+        password:
+          type: 'string'
+  
+  UpdateCustomerPayload:
+    type: 'object'
+    properties:
+      name:
+        type: 'string'
+      email:
+        type: 'string'
+      phone:
+        type: 'string'
+      password:
+        type: 'string'
+
+    required:
+      - 'name'
+      - 'email'
+      - 'phone'
+      - 'password'
+
+  UpdateCustomerResponse:
+    type: 'object'
+    properties:
+      id:
+        type: 'integer'
+      name:
+        type: 'string'
+      email:
+        type: 'string'
+      phone:
+        type: 'string'
+      password:
+        type: 'string'
+
+  DeleteCustomerResponse:
     type: 'object'
     properties:
       id:

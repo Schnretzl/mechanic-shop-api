@@ -117,7 +117,55 @@ paths:
             application/json:
               message: 'successfully deleted customer <customer_id>'
 
-  
+  /mechanics/login:
+    post:
+      tags:
+        - 'Mechanics'
+      summary: 'Login endpoint'
+      description: 'Validates mechanic login credentials, generates and returns a mechanic specific token'
+      parameters:
+        - in: 'body'
+          name: 'body'
+          description: 'Mechanic login credentials'
+          required: true
+          schema:
+            $ref: '#/definitions/MechanicLogin'
+      responses:
+        '200':
+          description: 'Login successful'
+          schema:
+            $ref: '#/definitions/LoginResponse'
+
+  /mechanics/popular:
+    get:
+      tags:
+        - 'Mechanics'
+      summary: 'Returns the most popular mechanics'
+      description: 'Endpoint to retrieve mechanics in order of number of tickets worked'
+      responses:
+        '200':
+          description: 'Most popular mechanics retrieved successfully'
+          schema:
+            $ref: '#/definitions/PopularMechanicsResponse'
+
+  /mechanics/search:
+    get:
+      tags:
+        - 'Mechanics'
+      summary: 'Search for mechanics'
+      description: 'Endpoint to search for mechanics by name'
+      parameters:
+        - in: 'query'
+          name: 'name'
+          description: 'Name of mechanic to search for'
+          required: true
+          type: 'string'
+      responses:
+        '200':
+          description: 'Mechanics retrieved successfully'
+          schema:
+            $ref: '#/definitions/SearchMechanicsResponse'
+            
 # =================================================================================================
 
 definitions:
@@ -236,3 +284,54 @@ definitions:
         type: 'string'
       password:
         type: 'string'
+
+  MechanicLogin:
+    type: 'object'
+    properties:
+      email:
+        type: 'string'
+      password:
+        type: 'string'
+
+    required:
+      - 'email'
+      - 'password'
+
+  PopularMechanicsResponse:
+    type: 'array'
+    items:
+      type: 'object'
+      properties:
+        id:
+          type: 'integer'
+        name:
+          type: 'string'
+        email:
+          type: 'string'
+        phone:
+          type: 'string'
+        salary:
+          type: 'number'
+          format: 'float'
+        password:
+          type: 'string'
+
+  SearchMechanicsResponse:
+    PopularMechanicsResponse:
+    type: 'array'
+    items:
+      type: 'object'
+      properties:
+        id:
+          type: 'integer'
+        name:
+          type: 'string'
+        email:
+          type: 'string'
+        phone:
+          type: 'string'
+        salary:
+          type: 'number'
+          format: 'float'
+        password:
+          type: 'string'

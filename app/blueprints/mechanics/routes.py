@@ -1,13 +1,13 @@
 from flask import request, jsonify
 from app.blueprints.mechanics import mechanics_blueprint
 from app.blueprints.mechanics.schemas import mechanic_schema, mechanics_schema
-from app.extensions import limiter
+from app.extensions import limiter, cache
 from marshmallow import ValidationError
 from app.models import Mechanic, ServiceTicket, db
 from sqlalchemy import select
 
 @mechanics_blueprint.route('/', methods=['POST'])
-# @limiter.limit("3 per hour")
+@limiter.limit("3 per hour")
 def create_mechanic():
     try:
         mechanic_data = mechanic_schema.load(request.json)
@@ -59,6 +59,7 @@ def delete_mechanic(mechanic_id):
     return jsonify({'message': 'Member deleted'}), 200
 
 @mechanics_blueprint.route('/popular', methods=['GET'])
+@cache.cached(timeout=60)
 def popular_mechanics():
     query = select(Mechanic)
     mechanics = db.session.execute(query).scalars().all()

@@ -48,7 +48,7 @@ class ServiceTicket(Base):
     customer: Mapped['Customer'] = db.relationship(back_populates='service_tickets')
     mechanics: Mapped[List['Mechanic']] = db.relationship(secondary=service_mechanics, back_populates='service_tickets')
     service_ticket_parts: Mapped[List['ServiceTicketPart']] = db.relationship(back_populates='service_ticket', cascade="all, delete")
-    parts: Mapped[List['Part']] = db.relationship(secondary='service_ticket_parts', back_populates='service_tickets')
+    parts: Mapped[List['Part']] = db.relationship(secondary='service_ticket_parts', back_populates='service_tickets', overlaps="part, service_ticket, service_ticket_parts")
    
 class Mechanic(Base):
     __tablename__ = 'mechanics'
@@ -70,5 +70,5 @@ class Part(Base):
     price: Mapped[float] = mapped_column(db.Float(10), nullable=False)
     quantity: Mapped[int] = mapped_column(db.Integer, nullable=False)
     
-    service_ticket_parts: Mapped[List['ServiceTicketPart']] = db.relationship(back_populates='part', cascade="all, delete")
-    service_tickets: Mapped[List['ServiceTicket']] = db.relationship(secondary='service_ticket_parts', back_populates='parts', cascade="all, delete")
+    service_ticket_parts: Mapped[List['ServiceTicketPart']] = db.relationship(back_populates='part', cascade="all, delete", overlaps="parts")
+    service_tickets: Mapped[List['ServiceTicket']] = db.relationship(secondary='service_ticket_parts', back_populates='parts', cascade="all, delete", overlaps="part, service_ticket, service_ticket_parts")

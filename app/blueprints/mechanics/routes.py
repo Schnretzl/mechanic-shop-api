@@ -84,7 +84,7 @@ def delete_mechanic(mechanic_id):
     db.session.delete(mechanic)
     db.session.commit()
     
-    return jsonify({'message': 'Member deleted'}), 200
+    return jsonify({'message': f'Successfully deleted mechanic {mechanic_id}'}), 200
 
 @mechanics_blueprint.route('/popular', methods=['GET'])
 @cache.cached(timeout=60)

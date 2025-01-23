@@ -42,7 +42,7 @@ paths:
       tags:
         - 'Customers'
       summary: 'Endpoint to create/register a new customer'
-      description: 'Endpoint to create a new customer for our mechanic shop system, email must be unique'
+      description: 'Endpoint to create a new customer for our mechanic shop system, email and phone must be unique'
       parameters:
         - in: 'body'
           name: 'body'
@@ -115,7 +115,7 @@ paths:
             $ref: '#/definitions/DeleteCustomerResponse'
           examples:
             application/json:
-              message: 'successfully deleted customer <customer_id>'
+              message: 'Successfully deleted customer <customer_id>'
 
   /mechanics/login:
     post:
@@ -165,7 +165,89 @@ paths:
           description: 'Mechanics retrieved successfully'
           schema:
             $ref: '#/definitions/SearchMechanicsResponse'
-            
+
+  /mechanics:
+    post:
+      tags:
+        - 'Mechanics'
+      summary: 'Endpoint to create/register a new mechanic'
+      description: 'Endpoint to create a new mechanic for our mechanic shop system, email and phone must be unique'
+      parameters:
+        - in: 'body'
+          name: 'body'
+          description: 'Information required to create a new mechanic'
+          required: true
+          schema:
+            $ref: '#/definitions/CreateMechanicPayload'
+      responses:
+        '201':
+          description: 'Mechanic created'
+          schema:
+            $ref: '#/definitions/CreateMechanicResponse'
+          examples:
+            application/json:
+              id: 1
+              name: 'John Doe'
+              email: 'jdoe@email.com'
+              phone: '1234567890'
+              salary: 1000.00
+              password: 'password123'
+
+    get:
+      tags:
+        - 'Mechanics'
+      summary: 'Returns all mechanics'
+      description: 'Endpoint to retrieve a list of all mechanics'
+      responses:
+        '200':
+          description: 'Mechanics retrieved successfully'
+          schema:
+            $ref: '#/definitions/AllMechanics'
+
+    put:
+      tags:
+        - 'Mechanics'
+      summary: 'Endpoint to update a mechanic'
+      description: 'Endpoint to update a mechanic, this is a token authenticated route, and the user must be logged in to update their information'
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: 'body'
+          name: 'body'
+          description: 'Information required to update a mechanic'
+          required: true
+          schema:
+            $ref: '#/definitions/UpdateMechanicPayload'
+      responses:
+        '200':
+          description: 'Mechanic updated'
+          schema:
+            $ref: '#/definitions/UpdateMechanicResponse'
+          examples:
+            application/json:
+              id: 1
+              name: 'Dohn Joe'
+              email: 'djoe@email.com'
+              phone: '9876543210'
+              salary: 2000.00
+              password: 'password123'
+              
+    delete:
+      tags:
+        - 'Mechanics'
+      summary: 'Endpoint to delete a mechanic'
+      description: 'Endpoint to delete a mechanic.  Requires token authentication, mechanic must be logged in to delete their account'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 'Successfully deleted mechanic'
+          schema:
+            $ref: '#/definitions/DeleteMechanicResponse'
+          examples:
+            application/json:
+              message: 'Successfully deleted mechanic <mechanic_id>'
+
 # =================================================================================================
 
 definitions:
@@ -334,4 +416,111 @@ definitions:
           type: 'number'
           format: 'float'
         password:
+          type: 'string'
+
+  CreateMechanicPayload:
+    type: 'object'
+    properties:
+      name:
+        type: 'string'
+      email:
+        type: 'string'
+      phone:
+        type: 'string'
+      salary:
+        type: 'number'
+        format: 'float'
+      password:
+        type: 'string'
+
+    required:
+      - 'name'
+      - 'email'
+      - 'phone'
+      - 'salary'
+      - 'password'
+
+  CreateMechanicResponse:
+    type: 'object'
+    properties:
+      id:
+        type: 'integer'
+      name:
+        type: 'string'
+      email:
+        type: 'string'
+      phone:
+        type: 'string'
+      salary:
+        type: 'number'
+        format: 'float'
+      password:
+        type: 'string'
+
+  AllMechanics:
+    type: 'array'
+    items:
+      type: 'object'
+      properties:
+        id:
+          type: 'integer'
+        name:
+          type: 'string'
+        email:
+          type: 'string'
+        phone:
+          type: 'string'
+        salary:
+          type: 'number'
+          format: 'float'
+        password:
+          type: 'string'
+
+  UpdateMechanicPayload:
+    type: 'object'
+    properties:
+      name:
+        type: 'string'
+      email:
+        type: 'string'
+      phone:
+        type: 'string'
+      salary:
+        type: 'number'
+        format: 'float'
+      password:
+        type: 'string'
+
+  UpdateMechanicResponse:
+    type: 'object'
+    properties:
+      id:
+        type: 'integer'
+      name:
+        type: 'string'
+      email:
+        type: 'string'
+      phone:
+        type: 'string'
+      salary:
+        type: 'number'
+        format: 'float'
+      password:
+        type: 'string'
+
+  DeleteMechanicResponse:
+    type: 'object'
+    properties:
+      id:
+        type: 'integer'
+      name:
+        type: 'string'
+      email:
+        type: 'string'
+      phone:
+        type: 'string'
+      salary:
+        type: 'number'
+        format: 'float'
+      password:
           type: 'string'

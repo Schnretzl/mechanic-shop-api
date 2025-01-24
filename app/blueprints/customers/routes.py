@@ -91,7 +91,8 @@ def update_customer(customer_id):
         return jsonify(e.messages), 400
     
     for field, value in customer_data.items():
-        setattr(customer, field, value)
+        if value:
+            setattr(customer, field, value)
         
     db.session.commit()
     

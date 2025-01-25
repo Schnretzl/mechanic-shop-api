@@ -77,4 +77,4 @@ def delete_part(part_id):
     
     db.session.delete(part)
     db.session.commit()
-    return jsonify({'message': 'Part deleted'}), 200
+    return jsonify({'message': f'Successfully deleted part {part_id}'}), 200

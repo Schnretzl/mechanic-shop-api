@@ -18,6 +18,9 @@ securityDefinitions:
     in: header
 
 paths:
+
+# Customers
+
   /customers/login:
     post:
       tags:
@@ -116,6 +119,8 @@ paths:
           examples:
             application/json:
               message: 'Successfully deleted customer <customer_id>'
+
+# Mechanics
 
   /mechanics/login:
     post:
@@ -231,7 +236,7 @@ paths:
               phone: '9876543210'
               salary: 2000.00
               password: 'password123'
-              
+
     delete:
       tags:
         - 'Mechanics'
@@ -248,9 +253,100 @@ paths:
             application/json:
               message: 'Successfully deleted mechanic <mechanic_id>'
 
+# Parts
+
+  /parts:
+    post:
+      tags:
+        - 'Parts'
+      summary: 'Endpoint to create a new part'
+      description: 'Endpoint to create a new part for our mechanic shop system'
+      parameters:
+        - in: 'body'
+          name: 'body'
+          description: 'Information required to create a new part'
+          required: true
+          schema:
+            $ref: '#/definitions/CreatePartPayload'
+      responses:
+        '201':
+          description: 'Part created'
+          schema:
+            $ref: '#/definitions/CreatePartResponse'
+          examples:
+            application/json:
+              id: 1
+              name: 'Engine'
+              price: 1000.00
+              quantity: 10
+
+    get:
+      tags:
+        - 'Parts'
+      summary: 'Returns all parts'
+      description: 'Endpoint to retrieve a list of all parts'
+      responses:
+        '200':
+          description: 'Parts retrieved successfully'
+          schema:
+            $ref: '#/definitions/AllParts'
+
+  /parts/{part_id}:
+    put:
+      tags:
+        - 'Parts'
+      summary: 'Endpoint to update a part'
+      description: 'Endpoint to update a part'
+      parameters:
+        - in: 'path'
+          name: 'part_id'
+          description: 'ID of part to update'
+          required: true
+          type: 'integer'
+        - in: 'body'
+          name: 'body'
+          description: 'Information required to update a part'
+          required: true
+          schema:
+            $ref: '#/definitions/UpdatePartPayload'
+      responses:
+        '200':
+          description: 'Part updated'
+          schema:
+            $ref: '#/definitions/UpdatePartResponse'
+          examples:
+            application/json:
+              id: 1
+              name: 'Engine'
+              price: 1000.00
+              quantity: 5
+
+    delete:
+      tags:
+        - 'Parts'
+      summary: 'Endpoint to delete a part'
+      description: 'Endpoint to delete a part'
+      parameters:
+        - in: 'path'
+          name: 'part_id'
+          description: 'ID of part to delete'
+          required: true
+          type: 'integer'
+      responses:
+        '200':
+          description: 'Successfully deleted part'
+          schema:
+            $ref: '#/definitions/DeletePartResponse'
+          examples:
+            application/json:
+              message: 'Successfully deleted part <part_id>'
+
 # =================================================================================================
 
 definitions:
+
+# Customers
+
   CustomerLogin:
     type: 'object'
     properties:
@@ -320,7 +416,7 @@ definitions:
           type: 'string'
         password:
           type: 'string'
-  
+
   UpdateCustomerPayload:
     type: 'object'
     properties:
@@ -356,16 +452,10 @@ definitions:
   DeleteCustomerResponse:
     type: 'object'
     properties:
-      id:
-        type: 'integer'
-      name:
+      message:
         type: 'string'
-      email:
-        type: 'string'
-      phone:
-        type: 'string'
-      password:
-        type: 'string'
+
+        # Mechanics
 
   MechanicLogin:
     type: 'object'
@@ -511,16 +601,82 @@ definitions:
   DeleteMechanicResponse:
     type: 'object'
     properties:
+      message:
+        type: 'string'
+
+
+# Parts
+
+  CreatePartPayload:
+    type: 'object'
+    properties:
+      name:
+        type: 'string'
+      price:
+        type: 'number'
+        format: 'float'
+      quantity:
+        type: 'integer'
+
+    required:
+      - 'name'
+      - 'price'
+      - 'quantity'
+
+  CreatePartResponse:
+    type: 'object'
+    properties:
       id:
         type: 'integer'
       name:
         type: 'string'
-      email:
-        type: 'string'
-      phone:
-        type: 'string'
-      salary:
+      price:
         type: 'number'
         format: 'float'
-      password:
+      quantity:
+        type: 'integer'
+
+  AllParts:
+    type: 'array'
+    items:
+      type: 'object'
+      properties:
+        id:
+          type: 'integer'
+        name:
           type: 'string'
+        price:
+          type: 'number'
+          format: 'float'
+        quantity:
+          type: 'integer'
+
+  UpdatePartPayload:
+    type: 'object'
+    properties:
+      name:
+        type: 'string'
+      price:
+        type: 'number'
+        format: 'float'
+      quantity:
+        type: 'integer'
+
+  UpdatePartResponse:
+    type: 'object'
+    properties:
+      id:
+        type: 'integer'
+      name:
+        type: 'string'
+      price:
+        type: 'number'
+        format: 'float'
+      quantity:
+        type: 'integer'
+
+  DeletePartResponse:
+    type: 'object'
+    properties:
+      message:
+        type: 'string'

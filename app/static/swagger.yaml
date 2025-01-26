@@ -341,6 +341,98 @@ paths:
             application/json:
               message: 'Successfully deleted part <part_id>'
 
+# Service Tickets
+
+  /service_tickets:
+    post:
+      tags:
+        - 'Service Tickets'
+      summary: 'Endpoint to create a new service ticket'
+      description: 'Endpoint to create a new service ticket for our mechanic shop system'
+      parameters:
+        - in: 'body'
+          name: 'body'
+          description: 'Information required to create a new service ticket'
+          required: true
+          schema:
+            $ref: '#/definitions/CreateServiceTicketPayload'
+      responses:
+        '201':
+          description: 'Service ticket created'
+          schema:
+            $ref: '#/definitions/CreateServiceTicketResponse'
+          examples:
+            application/json:
+              id: 1
+              VIN: '1234567890'
+              service_date: '2020-01-01'
+              service_desc: 'Oil change'
+              customer_id: 1
+              mechanic_ids: [1, 2]
+
+    get:
+      tags:
+        - 'Service Tickets'
+      summary: 'Returns all service tickets'
+      description: 'Endpoint to retrieve a list of all service tickets'
+      responses:
+        '200':
+          description: 'Service tickets retrieved successfully'
+          schema:
+            $ref: '#/definitions/AllServiceTickets'
+
+    put:
+      tags:
+        - 'Service Tickets'
+      summary: 'Endpoint to update a service ticket'
+      description: 'Endpoint to update a service ticket'
+      parameters:
+        - in: 'path'
+          name: 'service_ticket_id'
+          description: 'ID of service ticket to update'
+          required: true
+          type: 'integer'
+        - in: 'body'
+          name: 'body'
+          description: 'Information required to update a service ticket'
+          required: true
+          schema:
+            $ref: '#/definitions/UpdateServiceTicketPayload'
+      responses:
+        '200':
+          description: 'Service ticket updated'
+          schema:
+            $ref: '#/definitions/UpdateServiceTicketResponse'
+          examples:
+            application/json:
+              id: 1
+              VIN: '9876543210'
+              service_date: '2020-01-01'
+              service_desc: 'Routine maintenance'
+              customer_id: 1
+              mechanic_ids: [1, 2]
+
+  /service_tickets/{service_ticket_id}:
+    delete:
+      tags:
+        - 'Service Tickets'
+      summary: 'Endpoint to delete a service ticket'
+      description: 'Endpoint to delete a service ticket'
+      parameters:
+        - in: 'path'
+          name: 'service_ticket_id'
+          description: 'ID of service ticket to delete'
+          required: true
+          type: 'integer'
+      responses:
+        '200':
+          description: 'Successfully deleted service ticket'
+          schema:
+            $ref: '#/definitions/DeleteServiceTicketResponse'
+          examples:
+            application/json:
+              message: 'Successfully deleted service ticket <service_ticket_id>'
+
 # =================================================================================================
 
 definitions:
@@ -455,7 +547,8 @@ definitions:
       message:
         type: 'string'
 
-        # Mechanics
+
+# Mechanics
 
   MechanicLogin:
     type: 'object'
@@ -581,6 +674,13 @@ definitions:
       password:
         type: 'string'
 
+    required:
+      - 'name'
+      - 'email'
+      - 'phone'
+      - 'salary'
+      - 'password'
+
   UpdateMechanicResponse:
     type: 'object'
     properties:
@@ -662,6 +762,11 @@ definitions:
       quantity:
         type: 'integer'
 
+    required:
+      - 'name'
+      - 'price'
+      - 'quantity'
+
   UpdatePartResponse:
     type: 'object'
     properties:
@@ -676,6 +781,108 @@ definitions:
         type: 'integer'
 
   DeletePartResponse:
+    type: 'object'
+    properties:
+      message:
+        type: 'string'
+
+
+# Service Tickets
+
+  CreateServiceTicketPayload:
+    type: 'object'
+    properties:
+      VIN:
+        type: 'string'
+      service_date:
+        type: 'string'
+      service_desc:
+        type: 'string'
+      customer_id:
+        type: 'integer'
+      mechanic_ids:
+        type: 'array'
+        format: 'integer'
+
+    required:
+      - 'VIN'
+      - 'service_date'
+      - 'customer_id'
+
+  CreateServiceTicketResponse:
+    type: 'object'
+    properties:
+      id:
+        type: 'integer'
+      VIN:
+        type: 'string'
+      service_date:
+        type: 'string'
+      service_desc:
+        type: 'string'
+      customer_id:
+        type: 'integer'
+      mechanic_ids:
+        type: 'array'
+        format: 'integer'
+
+  AllServiceTickets:
+    type: 'array'
+    items:
+      type: 'object'
+      properties:
+        id:
+          type: 'integer'
+        VIN:
+          type: 'string'
+        service_date:
+          type: 'string'
+        service_desc:
+          type: 'string'
+        customer_id:
+          type: 'integer'
+        mechanic_ids:
+          type: 'array'
+          format: 'integer'
+
+  UpdateServiceTicketPayload:
+    type: 'object'
+    properties:
+      VIN:
+        type: 'string'
+      service_date:
+        type: 'string'
+      service_desc:
+        type: 'string'
+      customer_id:
+        type: 'integer'
+      mechanic_ids:
+        type: 'array'
+        format: 'integer'
+
+    required:
+      - 'VIN'
+      - 'service_date'
+      - 'customer_id'
+
+  UpdateServiceTicketResponse:
+    type: 'object'
+    properties:
+      id:
+        type: 'integer'
+      VIN:
+        type: 'string'
+      service_date:
+        type: 'string'
+      service_desc:
+        type: 'string'
+      customer_id:
+        type: 'integer'
+      mechanic_ids:
+          type: 'array'
+          format: 'integer'
+
+  DeleteServiceTicketResponse:
     type: 'object'
     properties:
       message:

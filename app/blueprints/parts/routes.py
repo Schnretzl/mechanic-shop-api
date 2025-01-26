@@ -75,6 +75,9 @@ def delete_part(part_id):
     query = select(Part).where(Part.id == part_id)
     part = db.session.execute(query).scalars().first()
     
+    if part is None:
+        return jsonify({'message': 'Part not found'}), 404
+    
     db.session.delete(part)
     db.session.commit()
     return jsonify({'message': f'Successfully deleted part {part_id}'}), 200

@@ -49,7 +49,7 @@ class ServiceTicket(Base):
     mechanics: Mapped[List['Mechanic']] = db.relationship(secondary=service_mechanics, back_populates='service_tickets')
     service_ticket_parts: Mapped[List['ServiceTicketPart']] = db.relationship(back_populates='service_ticket', cascade="all, delete")
     parts: Mapped[List['Part']] = db.relationship(secondary='service_ticket_parts', back_populates='service_tickets', overlaps="part, service_ticket, service_ticket_parts")
-   
+
 class Mechanic(Base):
     __tablename__ = 'mechanics'
     

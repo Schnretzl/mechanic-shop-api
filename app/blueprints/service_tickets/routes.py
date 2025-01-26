@@ -43,12 +43,12 @@ def get_service_tickets():
 
 @service_tickets_blueprint.route('/<int:service_ticket_id>', methods=['DELETE'])
 def delete_service_ticket(service_ticket_id):
-    query = delete(ServiceTicket).where(ServiceTicket.id == service_ticket_id)
+    query = select(ServiceTicket).where(ServiceTicket.id == service_ticket_id)
     service_ticket = db.session.execute(query).scalars().first()
     
     db.session.delete(service_ticket)
     db.session.commit()
-    return jsonify({'message': 'Service Ticket deleted'}), 200
+    return jsonify({'message': f'Successfully deleted service ticket {service_ticket_id}'}), 200
 
 @service_tickets_blueprint.route('/edit/mechanics/<int:service_ticket_id>', methods=['PUT'])
 def edit_service_ticket_mechanics(service_ticket_id):

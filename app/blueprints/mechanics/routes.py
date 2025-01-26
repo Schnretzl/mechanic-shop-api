@@ -69,7 +69,8 @@ def update_mechanic(mechanic_id):
         return jsonify(e.messages), 400
     
     for field, value in mechanic_data.items():
-        setattr(mechanic, field, value)
+        if value:
+            setattr(mechanic, field, value)
         
     db.session.commit()
     

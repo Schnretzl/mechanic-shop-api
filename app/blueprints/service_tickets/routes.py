@@ -50,7 +50,7 @@ def delete_service_ticket(service_ticket_id):
     db.session.commit()
     return jsonify({'message': f'Successfully deleted service ticket {service_ticket_id}'}), 200
 
-@service_tickets_blueprint.route('/edit/mechanics/<int:service_ticket_id>', methods=['PUT'])
+@service_tickets_blueprint.route('/<int:service_ticket_id>/edit/mechanics', methods=['PUT'])
 def edit_service_ticket_mechanics(service_ticket_id):
     try:
         service_ticket_edits = edit_mechanics_service_ticket_schema.load(request.json)
@@ -79,7 +79,7 @@ def edit_service_ticket_mechanics(service_ticket_id):
     db.session.commit()
     return service_ticket_schema.jsonify(service_ticket), 200
         
-@service_tickets_blueprint.route('/edit/parts/<int:service_ticket_id>', methods=['PUT'])
+@service_tickets_blueprint.route('/<int:service_ticket_id>/edit/parts', methods=['PUT'])
 def edit_service_ticket_parts(service_ticket_id):
     try:
         edit_data = add_part_service_ticket_schema.load(request.json)

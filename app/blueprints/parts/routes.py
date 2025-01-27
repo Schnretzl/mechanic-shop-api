@@ -36,7 +36,7 @@ def get_parts():
         result = db.session.execute(query).scalars().all()
         return parts_schema.jsonify(result), 200
 
-@parts_blueprint.route('/service_tickets/<int:part_id>', methods=['GET'])
+@parts_blueprint.route('/<int:part_id>/service_tickets', methods=['GET'])
 def get_part_tickets(part_id):
     query = select(Part).where(Part.id == part_id)
     part = db.session.execute(query).scalars().first()

@@ -14,15 +14,16 @@ def create_service_ticket():
         return jsonify(e.messages), 400
         
     new_service_ticket = ServiceTicket(VIN=service_ticket_data['VIN'], service_date=service_ticket_data['service_date'], service_desc=service_ticket_data['service_desc'], customer_id=service_ticket_data['customer_id'])
-    
-    for mechanic_id in service_ticket_data['mechanic_ids']:
-        query = select(Mechanic).where(Mechanic.id == mechanic_id)
-        mechanic = db.session.execute(query).scalar()
-        if mechanic:
-            new_service_ticket.mechanics.append(mechanic)
-        else:
-            return jsonify({'message': 'Invalid mechanic id'}), 404
-    
+
+    if 'mechanic_ids' in service_ticket_data:    
+        for mechanic_id in service_ticket_data['mechanic_ids']:
+            query = select(Mechanic).where(Mechanic.id == mechanic_id)
+            mechanic = db.session.execute(query).scalar()
+            if mechanic:
+                new_service_ticket.mechanics.append(mechanic)
+            else:
+                return jsonify({'message': 'Invalid mechanic id'}), 404
+
     db.session.add(new_service_ticket)
     db.session.commit()
     
@@ -40,6 +41,16 @@ def get_service_tickets():
         query = select(ServiceTicket)
         result = db.session.execute(query).scalars().all()
         return service_tickets_schema.jsonify(result), 200
+    
+@service_tickets_blueprint.route('/<int:service_ticket_id>', methods=['GET'])
+def get_service_ticket(service_ticket_id):
+    query = select(ServiceTicket).where(ServiceTicket.id == service_ticket_id)
+    service_ticket = db.session.execute(query).scalars().first()
+
+    if service_ticket is None:
+        return jsonify({'message': 'Service ticket not found'}), 404
+
+    return service_ticket_schema.jsonify(service_ticket), 200
 
 @service_tickets_blueprint.route('/<int:service_ticket_id>', methods=['DELETE'])
 def delete_service_ticket(service_ticket_id):
@@ -69,9 +80,9 @@ def edit_service_ticket_mechanics(service_ticket_id):
         else:
             return jsonify({'message': 'Invalid mechanic id', 'id': mechanic_id}), 404
         
-        for mechanic_id in service_ticket_edits['remove_mechanic_ids']:
-            query = select(Mechanic).where(Mechanic.id == mechanic_id)
-            mechanic = db.session.execute(query).scalars().first()
+    for mechanic_id in service_ticket_edits['remove_mechanic_ids']:
+        query = select(Mechanic).where(Mechanic.id == mechanic_id)
+        mechanic = db.session.execute(query).scalars().first()
         
         if mechanic and mechanic in service_ticket.mechanics:
             service_ticket.mechanics.remove(mechanic)

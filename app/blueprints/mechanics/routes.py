@@ -37,7 +37,6 @@ def login():
 def create_mechanic():
     try:
         mechanic_data = mechanic_schema.load(request.json)
-        print(mechanic_data)
     except ValidationError as e:
         return jsonify(e.messages), 400
         

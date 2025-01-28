@@ -71,10 +71,8 @@ def get_customer_tickets(customer_id):
         return jsonify({'message': 'Customer not found'}), 404
     
     service_tickets = customer.service_tickets
-    print(service_tickets)
     
     return customer_service_tickets_schema.jsonify(service_tickets), 200
-    
 
 @customers_blueprint.route('/', methods=['PUT'])
 @token_required

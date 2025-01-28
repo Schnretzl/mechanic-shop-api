@@ -120,6 +120,20 @@ paths:
             application/json:
               message: 'Successfully deleted customer <customer_id>'
 
+  /customers/my-tickets:
+    get:
+      tags:
+        - 'Customers'
+      summary: 'Returns all service tickets for a customer'
+      description: 'Endpoint to retrieve a list of all service tickets for a customer'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 'Service tickets retrieved successfully'
+          schema:
+            $ref: '#/definitions/GetCustomerTicketsResponse'
+
 # Mechanics
 
   /mechanics/login:
@@ -381,38 +395,24 @@ paths:
           schema:
             $ref: '#/definitions/AllServiceTickets'
 
-    put:
+  /service_tickets/{service_ticket_id}:
+    get:
       tags:
         - 'Service Tickets'
-      summary: 'Endpoint to update a service ticket'
-      description: 'Endpoint to update a service ticket'
+      summary: 'Returns a service ticket by ID'
+      description: 'Endpoint to retrieve a service ticket by ID'
       parameters:
         - in: 'path'
           name: 'service_ticket_id'
-          description: 'ID of service ticket to update'
+          description: 'ID of service ticket to retrieve'
           required: true
           type: 'integer'
-        - in: 'body'
-          name: 'body'
-          description: 'Information required to update a service ticket'
-          required: true
-          schema:
-            $ref: '#/definitions/UpdateServiceTicketPayload'
       responses:
         '200':
-          description: 'Service ticket updated'
+          description: 'Service ticket retrieved successfully'
           schema:
-            $ref: '#/definitions/UpdateServiceTicketResponse'
-          examples:
-            application/json:
-              id: 1
-              VIN: '9876543210'
-              service_date: '2020-01-01'
-              service_desc: 'Routine maintenance'
-              customer_id: 1
-              mechanic_ids: [1, 2]
+            $ref: '#/definitions/OneServiceTicket'
 
-  /service_tickets/{service_ticket_id}:
     delete:
       tags:
         - 'Service Tickets'
@@ -432,6 +432,54 @@ paths:
           examples:
             application/json:
               message: 'Successfully deleted service ticket <service_ticket_id>'
+
+  /service_tickets/{service_ticket_id}/edit/mechanics:
+    put:
+      tags:
+        - 'Service Tickets'
+      summary: 'Endpoint to edit mechanics on a service ticket'
+      description: 'Endpoint to add and remove mechanics on a service ticket'
+      parameters:
+        - in: 'path'
+          name: 'service_ticket_id'
+          description: 'ID of service ticket to edit mechanics on'
+          required: true
+          type: 'integer'
+        - in: 'body'
+          name: 'body'
+          description: 'Information required to edit mechanics to a service ticket'
+          required: true
+          schema:
+            $ref: '#/definitions/ServiceTicketEditMechanicsPayload'
+      responses:
+        '200':
+          description: 'Mechanics edited on service ticket'
+          schema:
+            $ref: '#/definitions/ServiceTicketEditMechanicsResponse'
+
+  /service_tickets/{service_ticket_id}/edit/parts:
+    put:
+      tags:
+        - 'Service Tickets'
+      summary: 'Endpoint to add a part to a service ticket'
+      description: 'Endpoint to add a part to a service ticket'
+      parameters:
+        - in: 'path'
+          name: 'service_ticket_id'
+          description: 'ID of service ticket to add a part to'
+          required: true
+          type: 'integer'
+        - in: 'body'
+          name: 'body'
+          description: 'Information required to edit parts to a service ticket'
+          required: true
+          schema:
+            $ref: '#/definitions/ServiceTicketEditPartsPayload'
+      responses:
+        '200':
+          description: 'Parts edited on service ticket'
+          schema:
+            $ref: '#/definitions/ServiceTicketEditPartsResponse'
 
 # =================================================================================================
 
@@ -824,7 +872,8 @@ definitions:
         type: 'integer'
       mechanic_ids:
         type: 'array'
-        format: 'integer'
+        items:
+          type: 'integer'
 
   AllServiceTickets:
     type: 'array'
@@ -843,29 +892,24 @@ definitions:
           type: 'integer'
         mechanic_ids:
           type: 'array'
-          format: 'integer'
+          items:
+            type: 'integer'
+        parts:
+          type: 'array'
+          items:
+            type: 'object'
+            properties:
+              id:
+                type: 'integer'
+              name:
+                type: 'string'
+              price:
+                type: 'number'
+                format: 'float'
+              quantity:
+                type: 'integer'
 
-  UpdateServiceTicketPayload:
-    type: 'object'
-    properties:
-      VIN:
-        type: 'string'
-      service_date:
-        type: 'string'
-      service_desc:
-        type: 'string'
-      customer_id:
-        type: 'integer'
-      mechanic_ids:
-        type: 'array'
-        format: 'integer'
-
-    required:
-      - 'VIN'
-      - 'service_date'
-      - 'customer_id'
-
-  UpdateServiceTicketResponse:
+  OneServiceTicket:
     type: 'object'
     properties:
       id:
@@ -879,10 +923,151 @@ definitions:
       customer_id:
         type: 'integer'
       mechanic_ids:
-          type: 'array'
-          format: 'integer'
+        type: 'array'
+        items:
+          type: 'integer'
+      parts:
+        type: 'array'
+        items:
+          type: 'object'
+          properties:
+            id:
+              type: 'integer'
+            name:
+              type: 'string'
+            price:
+              type: 'number'
+              format: 'float'
+            quantity:
+              type: 'integer'
 
   DeleteServiceTicketResponse:
+    type: 'object'
+    properties:
+      message:
+        type: 'string'
+
+  GetCustomerTicketsResponse:
+    type: 'array'
+    items:
+      type: 'object'
+      properties:
+        id:
+          type: 'integer'
+        VIN:
+          type: 'string'
+        service_date:
+          type: 'string'
+        service_desc:
+          type: 'string'
+        customer_id:
+          type: 'integer'
+        mechanic_ids:
+          type: 'array'
+          format: 'integer'
+        parts:
+          type: 'array'
+          items:
+            type: 'object'
+            properties:
+              id:
+                type: 'integer'
+              name:
+                type: 'string'
+              price:
+                type: 'number'
+                format: 'float'
+              quantity:
+                type: 'integer'
+
+  ServiceTicketEditMechanicsPayload:
+    type: 'object'
+    properties:
+      add_mechanic_ids:
+        type: 'array'
+        items:
+          type: 'integer'
+      remove_mechanic_ids:
+        type: 'array'
+        items:
+          type: 'integer'
+
+    required:
+      - 'add_mechanic_ids'
+      - 'remove_mechanic_ids'
+
+  ServiceTicketEditMechanicsResponse:
+    type: 'object'
+    properties:
+      id:
+        type: 'integer'
+      VIN:
+        type: 'string'
+      service_date:
+        type: 'string'
+      service_desc:
+        type: 'string'
+      customer:
+        type: 'object'
+        properties:
+          id:
+            type: 'integer'
+          name:
+            type: 'string'
+          email:
+            type: 'string'
+          phone:
+            type: 'string'
+          password:
+            type: 'string'
+      customer_id:
+        type: 'integer'
+      mechanics:
+        type: 'array'
+        items:
+          type: 'object'
+          properties:
+            id:
+              type: 'integer'
+            name:
+              type: 'string'
+            email:
+              type: 'string'
+            phone:
+              type: 'string'
+            salary:
+              type: 'number'
+              format: 'float'
+            password:
+              type: 'string'
+      parts:
+          type: 'array'
+          items:
+            type: 'object'
+            properties:
+              id:
+                type: 'integer'
+              name:
+                type: 'string'
+              price:
+                type: 'number'
+                format: 'float'
+              quantity:
+                type: 'integer'
+
+  ServiceTicketEditPartsPayload:
+    type: 'object'
+    properties:
+      part_id:
+        type: 'integer'
+      quantity:
+        type: 'integer'
+
+    required:
+      - 'part_id'
+      - 'quantity'
+
+  ServiceTicketEditPartsResponse:
     type: 'object'
     properties:
       message:

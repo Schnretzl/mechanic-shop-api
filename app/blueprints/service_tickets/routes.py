@@ -71,6 +71,9 @@ def edit_service_ticket_mechanics(service_ticket_id):
     query = select(ServiceTicket).where(ServiceTicket.id == service_ticket_id)
     service_ticket = db.session.execute(query).scalars().first()
     
+    if service_ticket is None:
+        return jsonify({'message': 'Service ticket not found'}), 404
+    
     for mechanic_id in service_ticket_edits['add_mechanic_ids']:
         query = select(Mechanic).where(Mechanic.id == mechanic_id)
         mechanic = db.session.execute(query).scalars().first()
@@ -108,4 +111,4 @@ def edit_service_ticket_parts(service_ticket_id):
         db.session.add(new_service_ticket_part)
         db.session.commit()  
     
-    return add_part_service_ticket_schema.jsonify(new_service_ticket_part), 200
+    return jsonify({'message': f'Added {edit_data['quantity']} of part {edit_data['part_id']} to ticket {service_ticket_id}.'}), 200

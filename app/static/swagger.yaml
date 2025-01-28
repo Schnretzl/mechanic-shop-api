@@ -355,6 +355,24 @@ paths:
             application/json:
               message: 'Successfully deleted part <part_id>'
 
+  /parts/{part_id}/service_tickets:
+    get:
+      tags:
+        - 'Parts'
+      summary: 'Returns all service tickets for a part'
+      description: 'Endpoint to retrieve a list of all service tickets for a part'
+      parameters:
+        - in: 'path'
+          name: 'part_id'
+          description: 'ID of part to retrieve service tickets for'
+          required: true
+          type: 'integer'
+      responses:
+        '200':
+          description: 'Service tickets retrieved successfully'
+          schema:
+            $ref: '#/definitions/GetPartTicketsResponse'
+
 # Service Tickets
 
   /service_tickets:
@@ -948,6 +966,39 @@ definitions:
         type: 'string'
 
   GetCustomerTicketsResponse:
+    type: 'array'
+    items:
+      type: 'object'
+      properties:
+        id:
+          type: 'integer'
+        VIN:
+          type: 'string'
+        service_date:
+          type: 'string'
+        service_desc:
+          type: 'string'
+        customer_id:
+          type: 'integer'
+        mechanic_ids:
+          type: 'array'
+          format: 'integer'
+        parts:
+          type: 'array'
+          items:
+            type: 'object'
+            properties:
+              id:
+                type: 'integer'
+              name:
+                type: 'string'
+              price:
+                type: 'number'
+                format: 'float'
+              quantity:
+                type: 'integer'
+
+  GetPartTicketsResponse:
     type: 'array'
     items:
       type: 'object'

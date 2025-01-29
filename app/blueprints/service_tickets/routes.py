@@ -111,4 +111,4 @@ def edit_service_ticket_parts(service_ticket_id):
         db.session.add(new_service_ticket_part)
         db.session.commit()  
     
-    return jsonify({'message': f'Added {edit_data['quantity']} of part {edit_data['part_id']} to ticket {service_ticket_id}.'}), 200
+    return jsonify({'message': f'Added {edit_data["quantity"]} of part {edit_data["part_id"]} to ticket {service_ticket_id}.'}), 200
